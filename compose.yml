@@ -1,0 +1,26 @@
+services:
+  api:
+    command:
+      - sh
+      - -c
+      - echo "api started after libsql became healthy" && sleep infinity
+    depends_on:
+      libsql:
+        condition: service_healthy
+    image: alpine:3.21
+
+  libsql:
+    build: .
+    command:
+      - sqld
+      - --http-listen-addr
+      - 0.0.0.0:8080
+      - --db-path
+      - /var/lib/sqld
+    ports:
+      - "8080:8080"
+    volumes:
+      - libsql-data:/var/lib/sqld
+
+volumes:
+  libsql-data:
